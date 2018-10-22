@@ -56,7 +56,7 @@ func (msg *SendMessage) PostMessage(token_type, access_token string) error {
 		return err
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 201 {
 		return errors.New(fmt.Sprintf("Status Code: %d", resp.StatusCode))
 	}
 
