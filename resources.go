@@ -3,7 +3,6 @@ package goteams
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -42,7 +41,7 @@ func GenerateToken(client_id, client_secret string) (string, string, error) {
 }
 
 // PostMessage sends a personal/channel message to conversation on Teams
-func (msg *SendMessage) PostMessage(token_type, access_token string) error {
+func (msg *SendMessage) PostMessage(token_type, access_token string) (int, error) {
 	urlApi := fmt.Sprintf("https://smba.trafficmanager.net/amer/v3/conversations/%s/activities/%s", msg.Conversation.ID, msg.ReplyToID)
 
 	data, _ := json.Marshal(msg)
@@ -53,12 +52,8 @@ func (msg *SendMessage) PostMessage(token_type, access_token string) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	if resp.StatusCode != 201 {
-		return errors.New(fmt.Sprintf("Status Code: %d", resp.StatusCode))
-	}
-
-	return nil
+	return resp.StatusCode, nil
 }
