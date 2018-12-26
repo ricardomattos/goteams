@@ -11,7 +11,7 @@ import (
 
 // GenerateToken get the token to communicate with the bot
 // It returns the token type and the access token
-func GenerateToken(clientID, clientSecret string) (string, string, error) {
+func GenerateToken(clientID, clientSecret string) (string, error) {
 	urlLogin := "https://login.microsoftonline.com/botframework.com/oauth2/v2.0/token"
 
 	data := url.Values{}
@@ -28,25 +28,27 @@ func GenerateToken(clientID, clientSecret string) (string, string, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
-		return "", "", err
+		return "", err
 	}
 
-	var token OAuth2Token
-	err = json.NewDecoder(resp.Body).Decode(&token)
+	var oauth2 OAuth2Token
+	err = json.NewDecoder(resp.Body).Decode(&oauth2)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 
-	return token.TokenType, token.AccessToken, nil
+	token := []string{oauth2.TokenType, oauth2.AccessToken}
+
+	return strings.Join(token, " "), nil
 }
 
 // PostMessage sends a personal/channel message to conversation on Teams
-func (msg *SendMessage) PostMessage(tokenType, accessToken string) (int, error) {
+func (msg *SendMessage) PostMessage(accessToken string) (int, error) {
 	urlApi := fmt.Sprintf("https://smba.trafficmanager.net/amer/v3/conversations/%s/activities/%s", msg.Conversation.ID, msg.ReplyToID)
 
 	data, _ := json.Marshal(msg)
 	req, _ := http.NewRequest("POST", urlApi, bytes.NewBuffer(data))
-	req.Header.Set("Authorization", fmt.Sprintf("%s %s", tokenType, accessToken))
+	req.Header.Set("Authorization", fmt.Sprintf("%s", accessToken))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
