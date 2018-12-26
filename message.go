@@ -6,7 +6,7 @@ type ReceivedMessage struct {
 	Text           string    `json:"text"`
 	TextFormat     string    `json:"textFormat"`
 	Type           string    `json:"type"`
-	Timestamp      time.Time `json:"timestamp"`
+	Timestamp      string `json:"timestamp"`
 	LocalTimestamp string    `json:"localTimestamp"`
 	ID             string    `json:"id"`
 	ChannelID      string    `json:"channelId"`
